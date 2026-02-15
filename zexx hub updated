@@ -1,0 +1,125 @@
+local Players = game:GetService("Players")
+local RS = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local Player = Players.LocalPlayer
+
+pcall(function()
+    game:GetService("StarterGui"):SetCoreGuiEnabled(Enum.CoreGuiType.PlayerList, false)
+    local function hideChar(char)
+        local hum = char:WaitForChild("Humanoid", 5)
+        if hum then
+            hum.DisplayDistanceType = Enum.HumanoidDisplayDistanceType.None
+            hum.DisplayName = ""
+        end
+    end
+    if Player.Character then
+        hideChar(Player.Character)
+    end
+    Player.CharacterAdded:Connect(hideChar)
+end)
+
+local Luna = loadstring(game:HttpGet(
+    "https://raw.githubusercontent.com/Nebula-Softworks/Luna-Interface-Suite/refs/heads/master/source.lua",
+    true
+))()
+
+local Window = Luna:CreateWindow({
+    Name = "Zexx Hub",
+    Subtitle = nil,
+    LogoID = "82795327169782",
+    LoadingEnabled = true,
+    LoadingTitle = "Luna Interface Suite",
+    LoadingSubtitle = "by Nebula Softworks",
+    ConfigSettings = {
+        RootFolder = nil,
+        ConfigFolder = "Zexx Hub"
+    }
+})
+
+local Tab = Window:CreateTab({
+    Name = "Main",
+    Icon = "view_in_ar",
+    ImageSource = "Material",
+    ShowTitle = true
+})
+
+local RebirthRE = RS.Packages.Knit.Services.RebirthService.RE
+local ArmRF = RS.Packages.Knit.Services.ArmWrestleService.RF
+local EggRF = RS.Packages.Knit.Services.EggService.RF
+
+local autoRebirth = false
+local autoSuper = false
+local autoCrit = false
+local autoEgg = false
+
+Tab:CreateToggle({
+    Name = "Auto Rebirth (Fast)",
+    CurrentValue = false,
+    Callback = function(v)
+        autoRebirth = v
+        if v then
+            task.spawn(function()
+                while autoRebirth do
+                    pcall(function()
+                        RebirthRE.onRebirthRequest:FireServer()
+                    end)
+                    task.wait(0.05)
+                end
+            end)
+        end
+    end
+}, "AutoRebirth")
+
+Tab:CreateToggle({
+    Name = "Auto Super Rebirth",
+    CurrentValue = false,
+    Callback = function(v)
+        autoSuper = v
+        if v then
+            task.spawn(function()
+                while autoSuper do
+                    pcall(function()
+                        RebirthRE.onSuperRebirth:FireServer()
+                    end)
+                    task.wait(1)
+                end
+            end)
+        end
+    end
+}, "AutoSuper")
+
+Tab:CreateToggle({
+    Name = "Auto Crit Hit (FAST)",
+    CurrentValue = false,
+    Callback = function(v)
+        autoCrit = v
+        if v then
+            task.spawn(function()
+                while autoCrit do
+                    RunService.Heartbeat:Wait()
+                    pcall(function()
+                        ArmRF.RequestCritHit:InvokeServer()
+                    end)
+                end
+            end)
+        end
+    end
+}, "AutoCrit")
+
+Tab:CreateToggle({
+    Name = "Auto Egg (Valentines)",
+    CurrentValue = false,
+    Callback = function(v)
+        autoEgg = v
+        if v then
+            task.spawn(function()
+                while autoEgg do
+                    pcall(function()
+                        EggRF.purchaseEgg:InvokeServer("Valentines", false)
+                    end)
+                    task.wait(0.3)
+                end
+            end)
+        end
+    end
+}, "AutoEgg")
